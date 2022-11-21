@@ -230,29 +230,31 @@ module.exports = function() {
           const resourceName = this.normalizePath(eventTypes.http.path);
           const methodLogicalId = this.getMethodLogicalId(resourceName, method);
           const resource = this.cfTemplate.Resources[methodLogicalId];
-          resource.DependsOn = resource.DependsOn ? new Set(resource.DependsOn) : new Set();
-          this.addMethodResponses(resource, eventTypes.http.documentation, this._models);
-          this.addRequestModels(resource, eventTypes.http.documentation, this._models);
-          if (!this.options['doc-safe-mode']) {
-            this.addDocumentationToApiGateway(
-              resource,
-              eventTypes.http.documentation.requestHeaders,
-              'header'
-            );
-            this.addDocumentationToApiGateway(
-              resource,
-              eventTypes.http.documentation.queryParams,
-              'querystring'
-            );
-            this.addDocumentationToApiGateway(
-              resource,
-              eventTypes.http.documentation.pathParams,
-              'path'
-            );
-          }
-          resource.DependsOn = Array.from(resource.DependsOn);
-          if (resource.DependsOn.length === 0) {
-            delete resource.DependsOn;
+          if (typeof resource !== 'undefined') {
+            resource.DependsOn = new Set();
+            this.addMethodResponses(resource, eventTypes.http.documentation);
+            this.addRequestModels(resource, eventTypes.http.documentation);
+            if (!this.options['doc-safe-mode']) {
+              this.addDocumentationToApiGateway( 
+                resource,
+                eventTypes.http.documentation.requestHeaders,
+                'header'
+              );
+              this.addDocumentationToApiGateway(
+                resource,
+                eventTypes.http.documentation.queryParams,
+                'querystring'
+              );
+              this.addDocumentationToApiGateway(
+                  resource,
+                  eventTypes.http.documentation.pathParams,
+                  'path'
+              );
+            }
+            resource.DependsOn = Array.from(resource.DependsOn);
+            if (resource.DependsOn.length === 0) {
+              delete resource.DependsOn;
+            }
           }
         }
 
